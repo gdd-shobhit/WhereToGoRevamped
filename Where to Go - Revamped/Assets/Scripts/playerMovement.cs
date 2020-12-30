@@ -90,7 +90,8 @@ public class playerMovement : MonoBehaviour
         
         if (Input.GetKeyDown(KeyCode.W) && jumps > 0)
         {
-            rb.AddForce(new Vector2(0, jumpForce * 100f), ForceMode2D.Force);
+            rb.AddForce(new Vector2(0, jumpForce), ForceMode2D.Force);
+            Debug.Log("JUMP");
             jumps--;
         }
 
