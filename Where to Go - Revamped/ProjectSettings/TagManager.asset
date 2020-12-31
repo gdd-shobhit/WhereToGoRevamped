@@ -6,6 +6,7 @@ TagManager:
   tags:
   - dead
   - alive
+  - paddle
   layers:
   - Default
   - TransparentFX
