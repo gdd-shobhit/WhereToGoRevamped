@@ -78,11 +78,11 @@ public class playerMovement : MonoBehaviour
     void Movement()
     {
         movement = Input.GetAxis("Horizontal");
-        vel = Vector2.ClampMagnitude(new Vector2(movement * speed * 10f, rb.velocity.y), clampVel) ;
+        vel = Vector2.ClampMagnitude(new Vector2(movement * speed * 100f, rb.velocity.y), clampVel) ;
         rb.AddForce(vel , ForceMode2D.Force);
         
         isWalled = Physics2D.OverlapCircle(feetPos.position, feetRadius, whatIsWall);
-        RaycastHit2D hit = Physics2D.Raycast(feetPos.position, Vector2.down);
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down);
         if (hit)
             if (hit.rigidbody.gameObject.tag != "alive") isGrounded = hit.distance < 0.01f;
 
@@ -94,6 +94,13 @@ public class playerMovement : MonoBehaviour
             Debug.Log("JUMP");
             jumps--;
         }
+
+        // New Movement
+
+        //movement = Input.GetAxis("Horizontal");
+        //Vector2 force = new Vector2(movement*speed*10f,)
+        //rb.AddForce()
+
 
         if (movement > 0 && facingRight == false) Flip();
         else if (movement < 0 && facingRight == true) Flip();

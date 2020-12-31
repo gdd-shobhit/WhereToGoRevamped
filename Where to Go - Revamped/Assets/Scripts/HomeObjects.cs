@@ -72,7 +72,7 @@ public class HomeObjects : MonoBehaviour
         if (gameObject.tag == "dead")
         {
             //Vector3 bloodVector = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, 1);
-            Instantiate(ps, transform.position, Quaternion.identity);
+            ///Instantiate(ps, transform.position, Quaternion.identity);
             Destroy(gameObject);
         }
     }
