@@ -15,7 +15,7 @@ public class playerMovement : MonoBehaviour
     public float speed;
     public int jumps=2;
     public int extraJumpValue;
-    private float movement=0f;
+    private float movementHorizontal=0f;
     private bool isGrappling = false;
     private bool grappleHit = false;
     public bool facingRight = true;
@@ -27,7 +27,6 @@ public class playerMovement : MonoBehaviour
     public float feetRadius;
     public float jumpForce=12f;
 
-    public Vector2 vel;
     public Vector2 finalForce;
     private float clampVel;
     public ParticleSystem skull;
@@ -40,19 +39,19 @@ public class playerMovement : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         grappleLine = gameObject.AddComponent<LineRenderer>();
-        clampVel = 10f;
+        clampVel = 9f;
         finalForce = Vector2.zero;
         grappleLine.material = m_Line;
         grappleLine.startWidth = 0.20f;
         grappleLine.enabled = false;
         grapple = Instantiate(grapplePrefab, transform.position, Quaternion.identity);
         grapple.SetActive(false);
-        jumps = extraJumpValue;
+        jumps = extraJumpValue+1;
         fireStance = false;
         frostStance = false;
     }
 
-    void FixedUpdate()
+    void Update()
     {
         if (!isGrappling)
         {
@@ -77,28 +76,28 @@ public class playerMovement : MonoBehaviour
         transform.localScale = Scaler;
     }
 
-    void Movement()
+    private void Movement()
     {
         finalForce = Vector2.zero;
-        movement = Input.GetAxis("Horizontal");
-        finalForce += Vector2.ClampMagnitude(new Vector2(movement * speed * 100f, 0), clampVel) ;
+        movementHorizontal = Input.GetAxis("Horizontal");
+        finalForce += new Vector2(movementHorizontal * speed , 0) ;
                  
 
-        if (IsGrounded() || IsWalled()) jumps = extraJumpValue;
-        
-        if (Input.GetKeyDown(KeyCode.Space) && IsGrounded())
+        //if (IsGrounded() || IsWalled()) jumps = extraJumpValue;
+        jumps = (IsGrounded() || IsWalled()) ? extraJumpValue+1: jumps;
+
+        if (Input.GetKeyDown(KeyCode.Space) && jumps>0)
         {
-            rb.AddForce(Vector2.up*jumpForce , ForceMode2D.Impulse);
-       
+            rb.AddForce(Vector2.up*jumpForce , ForceMode2D.Impulse);       
             jumps--;
         }
 
-
-        if (movement > 0 && facingRight == false) Flip();
-        else if (movement < 0 && facingRight == true) Flip();
+        if (movementHorizontal > 0 && facingRight == false) Flip();
+        else if (movementHorizontal < 0 && facingRight == true) Flip();
 
         // Applying Force
         rb.AddForce(finalForce, ForceMode2D.Force);
+        rb.velocity = Vector2.ClampMagnitude(rb.velocity, clampVel);
     }
 
     bool IsGrounded()
@@ -106,8 +105,7 @@ public class playerMovement : MonoBehaviour
         RaycastHit2D hit = Physics2D.Raycast(feetPos.position, Vector2.down);
         if (hit)
         {
-            Debug.Log("hit");
-            isGrounded = hit.rigidbody.gameObject.tag == "paddle" && hit.distance < 0.01f;
+            isGrounded = hit.rigidbody.gameObject.layer==8 && hit.distance < 0.01f;
         }
         return isGrounded;
     }
