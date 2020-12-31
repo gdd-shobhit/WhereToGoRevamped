@@ -13,7 +13,7 @@ public class playerMovement : MonoBehaviour
 
     public Rigidbody2D rb;
     public float speed=2f;
-    private int jumps=2;
+    public int jumps=2;
     public int extraJumpValue;
     private float movement=0f;
     private bool isGrappling = false;
@@ -82,13 +82,13 @@ public class playerMovement : MonoBehaviour
         rb.AddForce(vel , ForceMode2D.Force);
         
         isWalled = Physics2D.OverlapCircle(feetPos.position, feetRadius, whatIsWall);
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down);
+        RaycastHit2D hit = Physics2D.Raycast(feetPos.position, Vector2.down);
         if (hit)
             if (hit.rigidbody.gameObject.tag != "alive") isGrounded = hit.distance < 0.01f;
 
         if (isGrounded || isWalled) jumps = extraJumpValue;
         
-        if (Input.GetKeyDown(KeyCode.W) && jumps > 0)
+        if (Input.GetKeyDown(KeyCode.Space) && jumps > 0)
         {
             rb.AddForce(new Vector2(0, jumpForce), ForceMode2D.Force);
             Debug.Log("JUMP");
