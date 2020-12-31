@@ -12,10 +12,10 @@ public class playerMovement : MonoBehaviour
     private Vector3 grappleDestination;
 
     public Rigidbody2D rb;
-    public float speed=2f;
-    private int jumps=2;
+    public float speed;
+    public int jumps=2;
     public int extraJumpValue;
-    private float movement=0f;
+    private float movementHorizontal=0f;
     private bool isGrappling = false;
     private bool grappleHit = false;
     public bool facingRight = true;
@@ -27,7 +27,7 @@ public class playerMovement : MonoBehaviour
     public float feetRadius;
     public float jumpForce=12f;
 
-    public Vector2 vel;
+    public Vector2 finalForce;
     private float clampVel;
     public ParticleSystem skull;
     public ParticleSystem deathBlood;
@@ -39,18 +39,19 @@ public class playerMovement : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         grappleLine = gameObject.AddComponent<LineRenderer>();
-        clampVel = 10f;
+        clampVel = 9f;
+        finalForce = Vector2.zero;
         grappleLine.material = m_Line;
         grappleLine.startWidth = 0.20f;
         grappleLine.enabled = false;
         grapple = Instantiate(grapplePrefab, transform.position, Quaternion.identity);
         grapple.SetActive(false);
-        jumps = extraJumpValue;
+        jumps = extraJumpValue+1;
         fireStance = false;
         frostStance = false;
     }
 
-    void FixedUpdate()
+    void Update()
     {
         if (!isGrappling)
         {
@@ -75,35 +76,44 @@ public class playerMovement : MonoBehaviour
         transform.localScale = Scaler;
     }
 
-    void Movement()
+    private void Movement()
     {
-        movement = Input.GetAxis("Horizontal");
-        vel = Vector2.ClampMagnitude(new Vector2(movement * speed * 100f, rb.velocity.y), clampVel) ;
-        rb.AddForce(vel , ForceMode2D.Force);
-        
-        isWalled = Physics2D.OverlapCircle(feetPos.position, feetRadius, whatIsWall);
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down);
-        if (hit)
-            if (hit.rigidbody.gameObject.tag != "alive") isGrounded = hit.distance < 0.01f;
+        finalForce = Vector2.zero;
+        movementHorizontal = Input.GetAxis("Horizontal");
+        finalForce += new Vector2(movementHorizontal * speed , 0) ;
+                 
 
-        if (isGrounded || isWalled) jumps = extraJumpValue;
-        
-        if (Input.GetKeyDown(KeyCode.W) && jumps > 0)
+        //if (IsGrounded() || IsWalled()) jumps = extraJumpValue;
+        jumps = (IsGrounded() || IsWalled()) ? extraJumpValue+1: jumps;
+
+        if (Input.GetKeyDown(KeyCode.Space) && jumps>0)
         {
-            rb.AddForce(new Vector2(0, jumpForce), ForceMode2D.Force);
-            Debug.Log("JUMP");
+            rb.AddForce(Vector2.up*jumpForce , ForceMode2D.Impulse);       
             jumps--;
         }
 
-        // New Movement
+        if (movementHorizontal > 0 && facingRight == false) Flip();
+        else if (movementHorizontal < 0 && facingRight == true) Flip();
 
-        //movement = Input.GetAxis("Horizontal");
-        //Vector2 force = new Vector2(movement*speed*10f,)
-        //rb.AddForce()
+        // Applying Force
+        rb.AddForce(finalForce, ForceMode2D.Force);
+        rb.velocity = Vector2.ClampMagnitude(rb.velocity, clampVel);
+    }
 
+    bool IsGrounded()
+    {
+        RaycastHit2D hit = Physics2D.Raycast(feetPos.position, Vector2.down);
+        if (hit)
+        {
+            isGrounded = hit.rigidbody.gameObject.layer==8 && hit.distance < 0.01f;
+        }
+        return isGrounded;
+    }
 
-        if (movement > 0 && facingRight == false) Flip();
-        else if (movement < 0 && facingRight == true) Flip();
+    bool IsWalled()
+    {
+        isWalled = Physics2D.OverlapCircle(feetPos.position, feetRadius, whatIsWall);
+        return isWalled;
     }
 
     void DeathMangager()
