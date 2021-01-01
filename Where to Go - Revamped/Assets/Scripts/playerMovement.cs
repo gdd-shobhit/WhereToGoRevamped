@@ -10,12 +10,14 @@ public class playerMovement : MonoBehaviour
     public Material m_Line;
     private float GRAPPLE_DISTANCE = 4.0f;
     private Vector3 grappleDestination;
+    private Vector3 futureDirection;
 
     public Rigidbody2D rb;
     public float speed;
     public int jumps=2;
     public int extraJumpValue;
     private float movementHorizontal=0f;
+    private float movementVertical=0f;
     private bool isGrappling = false;
     private bool grappleHit = false;
     public bool facingRight = true;
@@ -41,6 +43,7 @@ public class playerMovement : MonoBehaviour
         grappleLine = gameObject.AddComponent<LineRenderer>();
         clampVel = 9f;
         finalForce = Vector2.zero;
+        futureDirection = Vector3.zero;
         grappleLine.material = m_Line;
         grappleLine.startWidth = 0.20f;
         grappleLine.enabled = false;
@@ -80,13 +83,13 @@ public class playerMovement : MonoBehaviour
     {
         finalForce = Vector2.zero;
         movementHorizontal = Input.GetAxis("Horizontal");
+        movementVertical = Input.GetAxis("Vertical");
+        futureDirection = new Vector3(movementHorizontal, movementVertical, 0);
         finalForce += new Vector2(movementHorizontal * speed , 0) ;
                  
-
-        //if (IsGrounded() || IsWalled()) jumps = extraJumpValue;
         jumps = (IsGrounded() || IsWalled()) ? extraJumpValue+1: jumps;
 
-        if (Input.GetKeyDown(KeyCode.Space) && jumps>0)
+        if (Input.GetKeyDown(KeyCode.W) && jumps>0)
         {
             rb.AddForce(Vector2.up*jumpForce , ForceMode2D.Impulse);       
             jumps--;
@@ -168,11 +171,11 @@ public class playerMovement : MonoBehaviour
     //Initialize the grapple
     void InitializeGrapple()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space))
         {
             Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         
-            grappleDestination = mousePos - new Vector3(transform.position.x, transform.position.y, -1);
+            grappleDestination = futureDirection - this.transform.position;
             grappleDestination.Normalize();
             grappleDestination = (grappleDestination * GRAPPLE_DISTANCE) + transform.position;
             grapple.transform.position = transform.position;
