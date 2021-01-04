@@ -258,9 +258,9 @@ GameObject:
   - component: {fileID: 2720175627976853853}
   - component: {fileID: 2720175627976853854}
   - component: {fileID: 2720175627976853855}
-  - component: {fileID: 2720175627976853852}
   - component: {fileID: 1790806776}
   - component: {fileID: 1790806771}
+  - component: {fileID: 7488778223289673981}
   m_Layer: 0
   m_Name: Player
   m_TagString: alive
@@ -334,42 +334,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &2720175627976853852
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2720175627976853849}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5d2ab20d68373514b8db5d456cfdf3bd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  grapplePrefab: {fileID: 0}
-  m_Line: {fileID: 2100000, guid: 670cca87a17844341847b2dfd83304c8, type: 2}
-  rb: {fileID: 1790806776}
-  speed: 2000
-  jumps: 2
-  extraJumpValue: 1
-  facingRight: 1
-  isGrounded: 0
-  isWalled: 0
-  whatIsGround:
-    serializedVersion: 2
-    m_Bits: 256
-  whatIsWall:
-    serializedVersion: 2
-    m_Bits: 512
-  feetPos: {fileID: 1417516005}
-  feetRadius: 1
-  jumpForce: 5
-  vel: {x: 0, y: 0}
-  finalForce: {x: 0, y: 0}
-  skull: {fileID: 0}
-  deathBlood: {fileID: 0}
-  fireStance: 0
-  frostStance: 0
 --- !u!50 &1790806776
 Rigidbody2D:
   serializedVersion: 4
@@ -417,3 +381,38 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &7488778223289673981
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2720175627976853849}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d2ab20d68373514b8db5d456cfdf3bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  grapplePrefab: {fileID: 0}
+  m_Line: {fileID: 2100000, guid: 670cca87a17844341847b2dfd83304c8, type: 2}
+  rb: {fileID: 1790806776}
+  speed: 13
+  jumps: 2
+  extraJumpValue: 1
+  facingRight: 1
+  isGrounded: 0
+  isWalled: 0
+  whatIsGround:
+    serializedVersion: 2
+    m_Bits: 256
+  whatIsWall:
+    serializedVersion: 2
+    m_Bits: 512
+  feetPos: {fileID: 1417516005}
+  feetRadius: 1
+  jumpForce: 20
+  finalForce: {x: 0, y: 0}
+  skull: {fileID: 0}
+  deathBlood: {fileID: 0}
+  fireStance: 0
+  frostStance: 0

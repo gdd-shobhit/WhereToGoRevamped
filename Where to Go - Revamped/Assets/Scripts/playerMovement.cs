@@ -10,12 +10,14 @@ public class playerMovement : MonoBehaviour
     public Material m_Line;
     private float GRAPPLE_DISTANCE = 4.0f;
     private Vector3 grappleDestination;
+    private Vector3 futureDirection;
 
     public Rigidbody2D rb;
     public float speed;
     public int jumps=2;
     public int extraJumpValue;
     private float movementHorizontal=0f;
+    private float movementVertical=0f;
     private bool isGrappling = false;
     private bool grappleHit = false;
     public bool facingRight = true;
@@ -41,6 +43,7 @@ public class playerMovement : MonoBehaviour
         grappleLine = gameObject.AddComponent<LineRenderer>();
         clampVel = 9f;
         finalForce = Vector2.zero;
+        futureDirection = Vector3.zero;
         grappleLine.material = m_Line;
         grappleLine.startWidth = 0.20f;
         grappleLine.enabled = false;
@@ -53,10 +56,13 @@ public class playerMovement : MonoBehaviour
 
     void Update()
     {
+        // making the player always visible because it sometimes go off the z axis and isnt visible
+        transform.position = new Vector3(transform.position.x, transform.position.y, 0);
         if (!isGrappling)
         {
             InitializeGrapple();
-            Movement();
+            Movement();  
+           
         }
         else
         {
@@ -80,15 +86,15 @@ public class playerMovement : MonoBehaviour
     {
         finalForce = Vector2.zero;
         movementHorizontal = Input.GetAxis("Horizontal");
-        finalForce += new Vector2(movementHorizontal * speed , 0) ;
+        movementVertical = Input.GetAxis("Vertical");
+        futureDirection = new Vector3(movementHorizontal, movementVertical, 0);
+        finalForce += new Vector2(movementHorizontal * speed * Time.deltaTime , 0) ;
                  
-
-        //if (IsGrounded() || IsWalled()) jumps = extraJumpValue;
         jumps = (IsGrounded() || IsWalled()) ? extraJumpValue+1: jumps;
 
-        if (Input.GetKeyDown(KeyCode.Space) && jumps>0)
+        if (Input.GetKeyDown(KeyCode.W) && jumps>0)
         {
-            rb.AddForce(Vector2.up*jumpForce , ForceMode2D.Impulse);       
+            rb.AddForce(Vector2.up * jumpForce * Time.deltaTime , ForceMode2D.Impulse);       
             jumps--;
         }
 
@@ -105,7 +111,7 @@ public class playerMovement : MonoBehaviour
         RaycastHit2D hit = Physics2D.Raycast(feetPos.position, Vector2.down);
         if (hit)
         {
-            isGrounded = hit.rigidbody.gameObject.layer==8 && hit.distance < 0.01f;
+            isGrounded = hit.rigidbody.gameObject.layer==8 && hit.distance < 0.02f;
         }
         return isGrounded;
     }
@@ -172,7 +178,7 @@ public class playerMovement : MonoBehaviour
         {
             Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         
-            grappleDestination = mousePos - new Vector3(transform.position.x, transform.position.y, -1);
+            grappleDestination = mousePos - this.transform.position;
             grappleDestination.Normalize();
             grappleDestination = (grappleDestination * GRAPPLE_DISTANCE) + transform.position;
             grapple.transform.position = transform.position;
@@ -191,7 +197,7 @@ public class playerMovement : MonoBehaviour
     {
         if (!grappleHit)
         {
-            grapple.transform.position = Vector3.Lerp(grapple.transform.position, grappleDestination, 0.1f);
+            grapple.transform.position = Vector3.Lerp(grapple.transform.position, grappleDestination, 0.06f);
             grappleLine.SetPosition(1, grapple.transform.position);
             RaycastHit2D hit = Physics2D.Raycast(grapple.transform.position, grappleDestination, 0.05f);
             if (hit)
@@ -199,10 +205,11 @@ public class playerMovement : MonoBehaviour
                     grappleHit = true;
             if (Vector2.Distance(grappleDestination, grapple.transform.position) < 0.2f)
                 EndGrapple();
+          
         }
         else
         {
-            transform.position = Vector3.Lerp(transform.position, grappleDestination, 0.1f);
+            transform.position = Vector3.Lerp(transform.position, grappleDestination, 0.06f);
             grappleLine.SetPosition(0, transform.position);
             if (Vector2.Distance(grapple.transform.position, transform.position) < 0.2f)
                 EndGrapple();
