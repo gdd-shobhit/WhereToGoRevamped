@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -13,9 +13,13 @@ public class GameManager : MonoBehaviour
         Normal
     }
 
+    [SerializeField] GameObject pauseMenu;
+
     public static GameManager instance;
     public Stances currentStance = Stances.Normal;
     public GameObject player;
+    private bool paused;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -27,6 +31,25 @@ public class GameManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
+        }
+
+        
+    }
+
+    private void Update()
+    {
+        //Pause the game when 
+        //escape is pressed
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (paused)
+            {
+                SetPause(false, 1);
+            }
+            else
+            {
+                SetPause(true, 0);
+            }
         }
     }
 
@@ -47,5 +70,16 @@ public class GameManager : MonoBehaviour
             player.GetComponent<playerMovement>().frostStance = false;
         }
 
+        
+    }
+
+    void SetPause(bool isPaused, int timeScale)
+    {
+        paused = isPaused;
+        Time.timeScale = timeScale;
+        if (pauseMenu != null)
+        {
+            pauseMenu.SetActive(isPaused);
+        }
     }
 }
