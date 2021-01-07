@@ -5,18 +5,10 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-
-    public enum Stances
-    {
-        Fire,
-        Frost,
-        Normal
-    }
-
     [SerializeField] GameObject pauseMenu;
 
     public static GameManager instance;
-    public Stances currentStance = Stances.Normal;
+    public float timeMultiplier = 1.0f;
     public GameObject player;
     private bool paused;
 
@@ -55,20 +47,7 @@ public class GameManager : MonoBehaviour
 
     // Update is called once per frame
     void FixedUpdate()
-    {
-        if(currentStance== Stances.Fire)
-        {
-            player.GetComponent<playerMovement>().fireStance = true;
-        }
-        if (currentStance == Stances.Frost)
-        {
-            player.GetComponent<playerMovement>().frostStance = true;
-        }
-        else
-        {
-            player.GetComponent<playerMovement>().fireStance = false;
-            player.GetComponent<playerMovement>().frostStance = false;
-        }
+    { 
 
         
     }

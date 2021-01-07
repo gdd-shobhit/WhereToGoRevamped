@@ -1,9 +1,18 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class playerMovement : MonoBehaviour
 {
+
+    public enum Stances
+    {
+        Fire,
+        Frost,
+        Normal
+    }
+
     public GameObject grapplePrefab;
     private GameObject grapple;
     private LineRenderer grappleLine;
@@ -11,6 +20,8 @@ public class playerMovement : MonoBehaviour
     private float GRAPPLE_DISTANCE = 4.0f;
     private Vector3 grappleDestination;
     private Vector3 futureDirection;
+
+    public Stances currentStance = Stances.Normal;
 
     public Rigidbody2D rb;
     public float speed;
@@ -21,7 +32,7 @@ public class playerMovement : MonoBehaviour
     private bool isGrappling = false;
     private bool grappleHit = false;
     public bool facingRight = true;
-    public bool isGrounded;
+    public bool isGrounded=false;
     public bool isWalled;
     public LayerMask whatIsGround;
     public LayerMask whatIsWall;
@@ -33,9 +44,7 @@ public class playerMovement : MonoBehaviour
     private float clampVel;
     public ParticleSystem skull;
     public ParticleSystem deathBlood;
-    public bool fireStance;
-    public bool frostStance;
-    //public int localExtraJumps;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -50,8 +59,6 @@ public class playerMovement : MonoBehaviour
         grapple = Instantiate(grapplePrefab, transform.position, Quaternion.identity);
         grapple.SetActive(false);
         jumps = extraJumpValue+1;
-        fireStance = false;
-        frostStance = false;
     }
 
     void Update()
@@ -68,10 +75,48 @@ public class playerMovement : MonoBehaviour
         {
             ShootGrapple();
         }
-        FireStance();
-        FrostStance();
+        ManageStances();
         DeathMangager();
+    }
 
+    private void ManageStances()
+    {
+        if (currentStance == Stances.Fire)
+        {
+            if (Input.GetKeyDown(KeyCode.F))
+                StartCoroutine(FireStance());
+            
+        }
+        else if (currentStance == Stances.Frost)
+            StartCoroutine(FrostStance());
+
+        else
+            // Means normal stances
+            NormalStances();
+    }
+    IEnumerator FireStance()
+    {
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            // Changes according to need
+            Debug.Log("Fire start");
+            yield return new WaitForSeconds(3);
+            // setting it to normal stance then
+            Debug.Log("Fire end after 3 seconds");
+            currentStance = Stances.Normal;
+        }
+    }
+
+    IEnumerator FrostStance()
+    {
+        GameManager.instance.timeMultiplier *= 0.25f;
+        yield return new WaitForSeconds(3);
+        currentStance = Stances.Normal;
+    }
+
+    private void NormalStances()
+    {
+        GameManager.instance.timeMultiplier = 1.0f;
     }
 
     void Flip()
@@ -94,7 +139,7 @@ public class playerMovement : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.W) && jumps>0)
         {
-            rb.AddForce(Vector2.up * jumpForce * Time.deltaTime , ForceMode2D.Impulse);       
+            rb.AddForce(Vector2.up * jumpForce * Time.deltaTime , ForceMode2D.Impulse);
             jumps--;
         }
 
@@ -143,42 +188,14 @@ public class playerMovement : MonoBehaviour
         }
     }
 
-    void FireStance()
-    {
-        if (fireStance)
-        {
-            // checking for fire stance
-            if (Input.GetKeyDown(KeyCode.F))
-            {
-                gameObject.transform.GetChild(2).gameObject.SetActive(true);
-                StartCoroutine(FirePower(3, gameObject.transform.GetChild(2).gameObject));
-            }              
-        }   
-    }
-
-    void FrostStance()
-    {
-        if (frostStance)
-        {
-
-        }
-    }
-
-    IEnumerator FirePower(float time, GameObject fireObject)
-    {       
-        yield return new WaitForSeconds(time);
-        fireObject.SetActive(false);
-        fireStance = false;      
-    }
-
     //Initialize the grapple
     void InitializeGrapple()
     {
         if (Input.GetMouseButtonDown(0))
         {
             Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        
             grappleDestination = mousePos - this.transform.position;
+            grappleDestination = new Vector3(grappleDestination.x, grappleDestination.y, transform.position.z);
             grappleDestination.Normalize();
             grappleDestination = (grappleDestination * GRAPPLE_DISTANCE) + transform.position;
             grapple.transform.position = transform.position;
@@ -202,7 +219,9 @@ public class playerMovement : MonoBehaviour
             RaycastHit2D hit = Physics2D.Raycast(grapple.transform.position, grappleDestination, 0.05f);
             if (hit)
                 if (hit.rigidbody.gameObject.tag != "alive")
+                {
                     grappleHit = true;
+                }
             if (Vector2.Distance(grappleDestination, grapple.transform.position) < 0.2f)
                 EndGrapple();
           
