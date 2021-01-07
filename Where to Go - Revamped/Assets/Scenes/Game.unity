@@ -759,6 +759,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d127e924db5db94b94fc9b6861f01f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  collider2D: {fileID: 0}
+  tag: 
 --- !u!1 &780116251
 GameObject:
   m_ObjectHideFlags: 0
@@ -1209,6 +1211,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d127e924db5db94b94fc9b6861f01f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  collider2D: {fileID: 0}
+  tag: 
 --- !u!1 &1312271544
 GameObject:
   m_ObjectHideFlags: 0
@@ -1500,7 +1504,7 @@ GameObject:
   - component: {fileID: 1708391896}
   m_Layer: 0
   m_Name: FrostVFX
-  m_TagString: Untagged
+  m_TagString: frost
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

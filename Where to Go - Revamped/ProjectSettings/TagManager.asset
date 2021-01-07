@@ -7,6 +7,7 @@ TagManager:
   - dead
   - alive
   - paddle
+  - frost
   layers:
   - Default
   - TransparentFX

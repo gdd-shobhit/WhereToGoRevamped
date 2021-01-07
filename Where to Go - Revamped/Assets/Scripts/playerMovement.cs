@@ -68,47 +68,50 @@ public class playerMovement : MonoBehaviour
         if (!isGrappling)
         {
             InitializeGrapple();
-            Movement();  
-           
+            Movement();
         }
         else
         {
             ShootGrapple();
         }
+
+        // Checkers
         ManageStances();
-        DeathMangager();
+        if (gameObject.activeSelf)
+        {
+            DeathMangager();
+        }
     }
 
     private void ManageStances()
     {
         if (currentStance == Stances.Fire)
         {
-            if (Input.GetKeyDown(KeyCode.F))
-                StartCoroutine(FireStance());
-            
+            StartCoroutine(FireStance());
+            currentStance = Stances.Normal;
         }
         else if (currentStance == Stances.Frost)
+        {
             StartCoroutine(FrostStance());
-
-        else
-            // Means normal stances
+            currentStance = Stances.Normal;
+        }
+        else if(currentStance == Stances.Normal)
+        {
             NormalStances();
+        }
+
     }
     IEnumerator FireStance()
     {
-        if (Input.GetKeyDown(KeyCode.F))
-        {
             // Changes according to need
             Debug.Log("Fire start");
             yield return new WaitForSeconds(3);
-            // setting it to normal stance then
-            Debug.Log("Fire end after 3 seconds");
-            currentStance = Stances.Normal;
-        }
+            currentStance = Stances.Normal;    
     }
 
     IEnumerator FrostStance()
     {
+        Debug.Log("Frost");
         GameManager.instance.timeMultiplier *= 0.25f;
         yield return new WaitForSeconds(3);
         currentStance = Stances.Normal;
@@ -154,7 +157,7 @@ public class playerMovement : MonoBehaviour
     bool IsGrounded()
     {
         RaycastHit2D hit = Physics2D.Raycast(feetPos.position, Vector2.down);
-        if (hit)
+        if (hit & hit.rigidbody != null)
         {
             isGrounded = hit.rigidbody.gameObject.layer==8 && hit.distance < 0.02f;
         }
@@ -169,17 +172,17 @@ public class playerMovement : MonoBehaviour
 
     void DeathMangager()
     {
-        if (gameObject.tag == "dead")
-        {
-            Vector3 bloodVector = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, 1);
-            Instantiate(deathBlood, bloodVector, Quaternion.identity);
-            gameObject.SetActive(false);
-            new WaitForSeconds(2);
-            gameObject.transform.position = new Vector3(0, 4, 1);
-            gameObject.transform.rotation = Quaternion.Euler(0, 0, 0);
-            gameObject.SetActive(true);
+        //if (gameObject.tag == "dead")
+        //{
+        //    Vector3 bloodVector = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, 1);
+        //    Instantiate(deathBlood, bloodVector, Quaternion.identity);
+        //    gameObject.SetActive(false);
+        //    new WaitForSeconds(2);
+        //    gameObject.transform.position = new Vector3(0, 4, 1);
+        //    gameObject.transform.rotation = Quaternion.Euler(0, 0, 0);
+        //    gameObject.SetActive(true);
            
-        }
+        //}
 
         if (gameObject.transform.position.y < -15f)
         {
