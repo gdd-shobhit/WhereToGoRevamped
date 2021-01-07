@@ -365,8 +365,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d2ab20d68373514b8db5d456cfdf3bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  grapplePrefab: {fileID: 0}
+  grapplePrefab: {fileID: 3832634087401615162, guid: a0cfd9541a12c944d8cc24b5fd39b8fc, type: 3}
   m_Line: {fileID: 2100000, guid: 670cca87a17844341847b2dfd83304c8, type: 2}
+  currentStance: 2
   rb: {fileID: 1790806776}
   speed: 13
   jumps: 2
@@ -386,5 +387,3 @@ MonoBehaviour:
   finalForce: {x: 0, y: 0}
   skull: {fileID: 0}
   deathBlood: {fileID: 0}
-  fireStance: 0
-  frostStance: 0
