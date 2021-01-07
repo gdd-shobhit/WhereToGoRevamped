@@ -10,6 +10,7 @@ public class ButtonFunctions : MonoBehaviour
     public void LoadOnClick(string sceneName)
     {
         SceneManager.LoadScene(sceneName);
+        Time.timeScale = 1;
     }
 
     //Exit the application

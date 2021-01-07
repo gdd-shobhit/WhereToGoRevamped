@@ -4,40 +4,41 @@ using UnityEngine;
 
 public class PickUp : MonoBehaviour
 {
-    public ParticleSystem effect;
-    public bool pickedUp = false;
-    public void GetPickedUp(GameObject gameObject)
+    //public ParticleSystem effect;
+    //public bool pickedUp = false;
+    public void GetPickedUp()
     {
-        StartCoroutine(PickupRoutine(gameObject, 5));
+        gameObject.transform.GetChild(0).gameObject.GetComponent<BoxCollider2D>().enabled = false;
+        StartCoroutine(PickupRoutine(gameObject.transform.GetChild(1).gameObject, 5f));
+        gameObject.transform.GetChild(0).gameObject.GetComponent<BoxCollider2D>().enabled = true;
     }
 
-    IEnumerator PickupRoutine(GameObject gameObject, float time)
+    IEnumerator PickupRoutine(GameObject obj,float time)
     {
-        ParticleSystem ps = gameObject.GetComponent<ParticleSystem>();
-        BoxCollider2D collider = gameObject.GetComponent<BoxCollider2D>();
-        ps.Stop();
-        collider.enabled = false;
+        Debug.Log("just before");
+        obj.SetActive(false);
         yield return new WaitForSeconds(time);
-        ps.Play();
-        collider.enabled = true;
+        obj.SetActive(true);
+        Debug.Log("just after");
+       
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.tag == "alive")
+        if (collision.name == "Player")
         {
-            Instantiate(effect, gameObject.transform.position, Quaternion.identity);
-            if(gameObject.tag == "frost")
+            if (gameObject.name == "Frost")
             {
-                collision.GetComponent<playerMovement>().frostStance = true;
-                return;
+                Debug.Log("" + gameObject.name);
+                collision.gameObject.GetComponent<playerMovement>().currentStance = playerMovement.Stances.Frost;
             }
-            collision.GetComponent<playerMovement>().fireStance = true;
-        }
-        
-    }
-    private void FixedUpdate()
-    {
-        
+            else
+            {
+                collision.gameObject.GetComponent<playerMovement>().currentStance = playerMovement.Stances.Fire;
+                Debug.Log("" + gameObject.name);
+            }
+
+            GetPickedUp();
+        }  
     }
 }
