@@ -194,8 +194,8 @@ public class playerMovement : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        
             grappleDestination = mousePos - this.transform.position;
+            grappleDestination = new Vector3(grappleDestination.x, grappleDestination.y, transform.position.z);
             grappleDestination.Normalize();
             grappleDestination = (grappleDestination * GRAPPLE_DISTANCE) + transform.position;
             grapple.transform.position = transform.position;
@@ -219,7 +219,9 @@ public class playerMovement : MonoBehaviour
             RaycastHit2D hit = Physics2D.Raycast(grapple.transform.position, grappleDestination, 0.05f);
             if (hit)
                 if (hit.rigidbody.gameObject.tag != "alive")
+                {
                     grappleHit = true;
+                }
             if (Vector2.Distance(grappleDestination, grapple.transform.position) < 0.2f)
                 EndGrapple();
           
