@@ -759,6 +759,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d127e924db5db94b94fc9b6861f01f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  collider2D: {fileID: 0}
+  tag: 
 --- !u!1 &780116251
 GameObject:
   m_ObjectHideFlags: 0
@@ -1209,6 +1211,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d127e924db5db94b94fc9b6861f01f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  collider2D: {fileID: 0}
+  tag: 
 --- !u!1 &1312271544
 GameObject:
   m_ObjectHideFlags: 0
@@ -1500,7 +1504,7 @@ GameObject:
   - component: {fileID: 1708391896}
   m_Layer: 0
   m_Name: FrostVFX
-  m_TagString: Untagged
+  m_TagString: frost
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2003,6 +2007,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2720175627976853849, guid: 08dccb99923334b4484ea7c6eb18f83a, type: 3}
+      propertyPath: m_TagString
+      value: alive
+      objectReference: {fileID: 0}
     - target: {fileID: 2720175627976853853, guid: 08dccb99923334b4484ea7c6eb18f83a, type: 3}
       propertyPath: m_RootOrder
       value: 1
@@ -2059,6 +2067,14 @@ PrefabInstance:
       propertyPath: speed
       value: 2500
       objectReference: {fileID: 0}
+    - target: {fileID: 7488778223289673981, guid: 08dccb99923334b4484ea7c6eb18f83a, type: 3}
+      propertyPath: m_Fire
+      value: 
+      objectReference: {fileID: 2100000, guid: b266c1ff1179d614f8331622c66b67ea, type: 2}
+    - target: {fileID: 7488778223289673981, guid: 08dccb99923334b4484ea7c6eb18f83a, type: 3}
+      propertyPath: m_Frost
+      value: 
+      objectReference: {fileID: 2100000, guid: fd07da818e23b764ba552214842c42f2, type: 2}
     - target: {fileID: 7488778223289673981, guid: 08dccb99923334b4484ea7c6eb18f83a, type: 3}
       propertyPath: jumpForce
       value: 1750

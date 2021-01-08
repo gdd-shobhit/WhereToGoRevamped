@@ -17,6 +17,9 @@ public class playerMovement : MonoBehaviour
     private GameObject grapple;
     private LineRenderer grappleLine;
     public Material m_Line;
+    public Material m_Fire;
+    public Material m_Frost;
+    public Material m_player;
     private float GRAPPLE_DISTANCE = 4.0f;
     private Vector3 grappleDestination;
     private Vector3 futureDirection;
@@ -25,20 +28,20 @@ public class playerMovement : MonoBehaviour
 
     public Rigidbody2D rb;
     public float speed;
-    public int jumps=2;
+    public int jumps = 2;
     public int extraJumpValue;
-    private float movementHorizontal=0f;
-    private float movementVertical=0f;
+    private float movementHorizontal = 0f;
+    private float movementVertical = 0f;
     private bool isGrappling = false;
     private bool grappleHit = false;
     public bool facingRight = true;
-    public bool isGrounded=false;
+    public bool isGrounded = false;
     public bool isWalled;
     public LayerMask whatIsGround;
     public LayerMask whatIsWall;
     public Transform feetPos;
     public float feetRadius;
-    public float jumpForce=12f;
+    public float jumpForce = 12f;
 
     public Vector2 finalForce;
     private float clampVel;
@@ -53,12 +56,13 @@ public class playerMovement : MonoBehaviour
         clampVel = 9f;
         finalForce = Vector2.zero;
         futureDirection = Vector3.zero;
+        m_player = gameObject.GetComponent<MeshRenderer>().material;
         grappleLine.material = m_Line;
         grappleLine.startWidth = 0.20f;
         grappleLine.enabled = false;
         grapple = Instantiate(grapplePrefab, transform.position, Quaternion.identity);
         grapple.SetActive(false);
-        jumps = extraJumpValue+1;
+        jumps = extraJumpValue + 1;
     }
 
     void Update()
@@ -68,55 +72,63 @@ public class playerMovement : MonoBehaviour
         if (!isGrappling)
         {
             InitializeGrapple();
-            Movement();  
-           
+            Movement();
         }
         else
         {
             ShootGrapple();
         }
+
+        // Checkers
         ManageStances();
-        DeathMangager();
+
+        if (gameObject.activeSelf || gameObject.tag!="test")
+        {
+            DeathMangager();
+        }
     }
 
     private void ManageStances()
     {
         if (currentStance == Stances.Fire)
         {
-            if (Input.GetKeyDown(KeyCode.F))
-                StartCoroutine(FireStance());
-            
+            StartCoroutine(FireStance());
+            currentStance = Stances.Normal;
         }
         else if (currentStance == Stances.Frost)
+        {
             StartCoroutine(FrostStance());
-
-        else
-            // Means normal stances
+            currentStance = Stances.Normal;
+        }
+        else if (currentStance == Stances.Normal)
+        {
             NormalStances();
+        }
+
     }
     IEnumerator FireStance()
     {
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            // Changes according to need
-            Debug.Log("Fire start");
-            yield return new WaitForSeconds(3);
-            // setting it to normal stance then
-            Debug.Log("Fire end after 3 seconds");
-            currentStance = Stances.Normal;
-        }
+        gameObject.tag = "immortal";
+        gameObject.GetComponent<MeshRenderer>().material = m_Fire;
+        yield return new WaitForSeconds(3);
+        gameObject.tag = gameObject.tag != "test" ? "alive" : gameObject.tag;
+        gameObject.GetComponent<MeshRenderer>().material = m_player;
+        currentStance = Stances.Normal;
     }
 
     IEnumerator FrostStance()
     {
         GameManager.instance.timeMultiplier *= 0.25f;
+        gameObject.GetComponent<MeshRenderer>().material = m_Frost;
         yield return new WaitForSeconds(3);
+        gameObject.GetComponent<MeshRenderer>().material = m_player;
+        GameManager.instance.timeMultiplier = 1.0f;
         currentStance = Stances.Normal;
     }
 
     private void NormalStances()
     {
-        GameManager.instance.timeMultiplier = 1.0f;
+
     }
 
     void Flip()
@@ -133,13 +145,13 @@ public class playerMovement : MonoBehaviour
         movementHorizontal = Input.GetAxis("Horizontal");
         movementVertical = Input.GetAxis("Vertical");
         futureDirection = new Vector3(movementHorizontal, movementVertical, 0);
-        finalForce += new Vector2(movementHorizontal * speed * Time.deltaTime , 0) ;
-                 
-        jumps = (IsGrounded() || IsWalled()) ? extraJumpValue+1: jumps;
+        finalForce += new Vector2(movementHorizontal * speed * Time.deltaTime, 0);
 
-        if (Input.GetKeyDown(KeyCode.W) && jumps>0)
+        jumps = (IsGrounded() || IsWalled()) ? extraJumpValue + 1 : jumps;
+
+        if (Input.GetKeyDown(KeyCode.W) && jumps > 0)
         {
-            rb.AddForce(Vector2.up * jumpForce * Time.deltaTime , ForceMode2D.Impulse);
+            rb.AddForce(Vector2.up * jumpForce * Time.deltaTime, ForceMode2D.Impulse);
             jumps--;
         }
 
@@ -154,9 +166,9 @@ public class playerMovement : MonoBehaviour
     bool IsGrounded()
     {
         RaycastHit2D hit = Physics2D.Raycast(feetPos.position, Vector2.down);
-        if (hit)
+        if (hit & hit.rigidbody != null)
         {
-            isGrounded = hit.rigidbody.gameObject.layer==8 && hit.distance < 0.02f;
+            isGrounded = hit.rigidbody.gameObject.layer == 8 && hit.distance < 0.02f;
         }
         return isGrounded;
     }
@@ -169,23 +181,32 @@ public class playerMovement : MonoBehaviour
 
     void DeathMangager()
     {
-        if (gameObject.tag == "dead")
-        {
-            Vector3 bloodVector = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, 1);
-            Instantiate(deathBlood, bloodVector, Quaternion.identity);
-            gameObject.SetActive(false);
-            new WaitForSeconds(2);
-            gameObject.transform.position = new Vector3(0, 4, 1);
-            gameObject.transform.rotation = Quaternion.Euler(0, 0, 0);
-            gameObject.SetActive(true);
-           
-        }
+        //if (gameObject.tag == "dead")
+        //{
+        //    Vector3 bloodVector = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, 1);
+        //    Instantiate(deathBlood, bloodVector, Quaternion.identity);
+        //    gameObject.SetActive(false);
+        //    new WaitForSeconds(2);
+        //    gameObject.transform.position = new Vector3(0, 4, 1);
+        //    gameObject.transform.rotation = Quaternion.Euler(0, 0, 0);
+        //    gameObject.SetActive(true);
+
+        //}
+        if(gameObject.tag=="dead")
+        Respawn();
 
         if (gameObject.transform.position.y < -15f)
         {
-            gameObject.transform.position = new Vector3(0, 4, 1);
+            gameObject.transform.position = new Vector3(0, 4, 0);
             gameObject.transform.rotation = Quaternion.Euler(0, 0, 0);
         }
+    }
+
+    void Respawn()
+    {
+            gameObject.SetActive(true);
+            gameObject.transform.position = new Vector3(0, 3, 0);
+            gameObject.tag = "alive";
     }
 
     //Initialize the grapple

@@ -7,6 +7,9 @@ TagManager:
   - dead
   - alive
   - paddle
+  - frost
+  - immortal
+  - test
   layers:
   - Default
   - TransparentFX
