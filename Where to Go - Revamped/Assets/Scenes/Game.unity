@@ -2007,6 +2007,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2720175627976853849, guid: 08dccb99923334b4484ea7c6eb18f83a, type: 3}
+      propertyPath: m_TagString
+      value: alive
+      objectReference: {fileID: 0}
     - target: {fileID: 2720175627976853853, guid: 08dccb99923334b4484ea7c6eb18f83a, type: 3}
       propertyPath: m_RootOrder
       value: 1
@@ -2063,6 +2067,14 @@ PrefabInstance:
       propertyPath: speed
       value: 2500
       objectReference: {fileID: 0}
+    - target: {fileID: 7488778223289673981, guid: 08dccb99923334b4484ea7c6eb18f83a, type: 3}
+      propertyPath: m_Fire
+      value: 
+      objectReference: {fileID: 2100000, guid: b266c1ff1179d614f8331622c66b67ea, type: 2}
+    - target: {fileID: 7488778223289673981, guid: 08dccb99923334b4484ea7c6eb18f83a, type: 3}
+      propertyPath: m_Frost
+      value: 
+      objectReference: {fileID: 2100000, guid: fd07da818e23b764ba552214842c42f2, type: 2}
     - target: {fileID: 7488778223289673981, guid: 08dccb99923334b4484ea7c6eb18f83a, type: 3}
       propertyPath: jumpForce
       value: 1750

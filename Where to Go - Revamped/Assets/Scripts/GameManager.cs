@@ -19,6 +19,11 @@ public class GameManager : MonoBehaviour
         {
             instance = this;
             player = GameObject.FindGameObjectWithTag("alive");
+            if (player == null)
+            {
+                player = GameObject.FindGameObjectWithTag("test");
+            }
+               
         }
         else
         {

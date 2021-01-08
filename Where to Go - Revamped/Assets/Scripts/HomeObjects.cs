@@ -25,31 +25,32 @@ public class HomeObjects : MonoBehaviour
     private void Update()
     {
         timer += Time.deltaTime;
+        if (targetTransform != null)
+        {
+
+            Vector2 direction = (Vector2)targetTransform.position - rb.position;
+
+            direction.Normalize();
+
+            float rotateAmount = Vector3.Cross(direction, transform.up).z;
+
+            rb.angularVelocity = -rotateAmount * rotateSpeed * GameManager.instance.timeMultiplier;
+
+            rb.velocity = transform.up * speed * GameManager.instance.timeMultiplier;
+
+        }
+        if (timer > 10)
+        {
+            gameObject.tag = "dead";
+            timer = 0;
+        }
         DeathMangager();
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        if (targetTransform != null)
-        {
-
-        Vector2 direction = (Vector2)targetTransform.position - rb.position;
-
-        direction.Normalize();
-
-        float rotateAmount = Vector3.Cross(direction, transform.up).z;
-
-        rb.angularVelocity = -rotateAmount * rotateSpeed;
-
-        rb.velocity = transform.up * speed * GameManager.instance.timeMultiplier;
-
-        }
-        if (timer>10)
-        {
-            gameObject.tag = "dead";
-            timer = 0;
-        }
+       
 
     }
 
@@ -57,10 +58,9 @@ public class HomeObjects : MonoBehaviour
     {
         if (collision.gameObject.tag == "alive")
         {
-            if (!collision.gameObject.transform.GetChild(2).gameObject.activeSelf)
-                collision.gameObject.tag = "dead";
-            gameObject.tag = "dead";
+            collision.gameObject.tag = "dead";
         }
+        gameObject.tag = "dead";
     }
     void DeathMangager()
     {

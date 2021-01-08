@@ -10,6 +10,7 @@ public class PickUp : MonoBehaviour
     public new string tag;
     private void Start()
     {
+        tag = gameObject.transform.GetChild(1).gameObject.tag;
         collider2D = gameObject.transform.GetChild(0).gameObject.GetComponent<BoxCollider2D>();
     }
 
@@ -20,7 +21,7 @@ public class PickUp : MonoBehaviour
 
     IEnumerator PickupRoutine(GameObject obj,float time)
     {
-        tag = obj.tag;
+
         obj.SetActive(false);
         collider2D.enabled = false;
         yield return new WaitForSeconds(time);
