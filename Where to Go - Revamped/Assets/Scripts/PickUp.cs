@@ -6,35 +6,35 @@ public class PickUp : MonoBehaviour
 {
     //public ParticleSystem effect;
     //public bool pickedUp = false;
-    public new BoxCollider2D collider2D;
+    public new Collider collider;
     public new string tag;
     private void Start()
     {
-        tag = gameObject.transform.GetChild(1).gameObject.tag;
-        collider2D = gameObject.transform.GetChild(0).gameObject.GetComponent<BoxCollider2D>();
+        tag = gameObject.transform.GetChild(0).gameObject.tag;
+        collider = gameObject.GetComponent<Collider>();
     }
 
     public void GetPickedUp()
     {
-        StartCoroutine(PickupRoutine(gameObject.transform.GetChild(1).gameObject, 5f));        
+        StartCoroutine(PickupRoutine(gameObject.transform.GetChild(0).gameObject, 5f));        
     }
 
     IEnumerator PickupRoutine(GameObject obj,float time)
     {
 
         obj.SetActive(false);
-        collider2D.enabled = false;
+        collider.enabled = false;
         yield return new WaitForSeconds(time);
-        collider2D.enabled = true;
+        collider.enabled = true;
         obj.SetActive(true);      
     }
 
-    private void Update()
+    private void OnCollisionEnter(Collision collision)
     {
-        if (GameManager.instance.player.GetComponent<BoxCollider2D>().IsTouching(collider2D) && collider2D.enabled)
+        if (collision.gameObject.name == "player")
         {
             GameManager.instance.player.GetComponent<playerMovement>().currentStance = tag == "frost" ? playerMovement.Stances.Frost : playerMovement.Stances.Fire;
             GetPickedUp();
-        }        
+        }
     }
 }
