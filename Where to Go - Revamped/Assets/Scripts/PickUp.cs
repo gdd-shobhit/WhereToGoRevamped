@@ -19,9 +19,8 @@ public class PickUp : MonoBehaviour
         StartCoroutine(PickupRoutine(gameObject.transform.GetChild(0).gameObject, 5f));        
     }
 
-    IEnumerator PickupRoutine(GameObject obj,float time)
+    IEnumerator PickupRoutine(GameObject obj , float time)
     {
-
         obj.SetActive(false);
         collider.enabled = false;
         yield return new WaitForSeconds(time);
@@ -31,7 +30,7 @@ public class PickUp : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.name == "player")
+        if (collision.gameObject.name == "Player")
         {
             GameManager.instance.player.GetComponent<playerMovement>().currentStance = tag == "frost" ? playerMovement.Stances.Frost : playerMovement.Stances.Fire;
             GetPickedUp();

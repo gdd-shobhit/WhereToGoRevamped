@@ -22,11 +22,11 @@ public class playerMovement : MonoBehaviour
     public Material m_player;
     private float GRAPPLE_DISTANCE = 4.0f;
     private Vector3 grappleDestination;
-    private Vector3 futureDirection;
 
     public Stances currentStance = Stances.Normal;
 
     public Rigidbody rb;
+    public Vector3 centerOfMassActual;
     public float speed;
     public int jumps = 2;
     public int extraJumpValue;
@@ -54,7 +54,8 @@ public class playerMovement : MonoBehaviour
         grappleLine = gameObject.AddComponent<LineRenderer>();
         clampVel = 9f;
         finalForce = Vector2.zero;
-        futureDirection = Vector3.zero;
+        centerOfMassActual = Vector3.zero;
+        rb.centerOfMass = centerOfMassActual;
         m_player = gameObject.GetComponent<MeshRenderer>().material;
         grappleLine.material = m_Line;
         grappleLine.startWidth = 0.20f;
@@ -66,6 +67,7 @@ public class playerMovement : MonoBehaviour
 
     void Update()
     {
+        rb.angularVelocity = Vector3.zero;
         // making the player always visible because it sometimes go off the z axis and isnt visible
         transform.position = new Vector3(transform.position.x, transform.position.y, 0);
         if (!isGrappling)
@@ -141,6 +143,7 @@ public class playerMovement : MonoBehaviour
     private void Movement()
     {
         finalForce = Vector2.zero;
+        
         movementHorizontal = Input.GetAxis("Horizontal");
         finalForce = new Vector3(movementHorizontal * speed * Time.deltaTime, 0);
 
@@ -149,6 +152,7 @@ public class playerMovement : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.W) && jumps > 0)
         {
             rb.AddForce(Vector3.up * jumpForce * Time.deltaTime, ForceMode.Impulse);
+            //transform.position += Vector3.up * jumpForce * Time.deltaTime;
             jumps--;
         }
 
@@ -156,8 +160,13 @@ public class playerMovement : MonoBehaviour
         else if (movementHorizontal < 0 && facingRight == true) Flip();
 
         // Applying Force
-        rb.AddForce(finalForce, ForceMode.Force);
-        //rb.velocity = Vector3.ClampMagnitude(rb.velocity, clampVel);
+        rb.AddForceAtPosition(finalForce, gameObject.transform.position,ForceMode.Force);
+        // rb.AddForce(finalForce, ForceMode.Force);
+        rb.velocity = Vector3.ClampMagnitude(rb.velocity, clampVel);
+
+        // for kinetic object
+        // transform.position += new Vector3(movementHorizontal, 0, 0);
+
     }
 
     bool IsGrounded()
@@ -174,12 +183,13 @@ public class playerMovement : MonoBehaviour
 
     bool IsWalled()
     {
-        Collider[] collidersHit = Physics.OverlapSphere(feetPos.position, 0.5f, 9);
-        foreach(Collider collider in collidersHit)
+        Collider[] collidersHit = Physics.OverlapSphere(feetPos.position, feetRadius);
+        //Collider[] collidersHit = Physics.OverlapBox(feetPos.position,)
+        foreach (Collider collider in collidersHit)
         {
             isWalled = collider.gameObject.layer == 9;
         }
-
+        
         return isWalled;
     }
 
