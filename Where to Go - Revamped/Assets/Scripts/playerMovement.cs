@@ -13,15 +13,11 @@ public class playerMovement : MonoBehaviour
         Normal
     }
 
-    public GameObject grapplePrefab;
-    private GameObject grapple;
-    private LineRenderer grappleLine;
     public Material m_Line;
     public Material m_Fire;
     public Material m_Frost;
     public Material m_player;
-    private float GRAPPLE_DISTANCE = 4.0f;
-    private Vector3 grappleDestination;
+    private Vector3 futureDirection;
 
     public Stances currentStance = Stances.Normal;
 
@@ -31,8 +27,7 @@ public class playerMovement : MonoBehaviour
     public int jumps = 2;
     public int extraJumpValue;
     private float movementHorizontal = 0f;
-    private bool isGrappling = false;
-    private bool grappleHit = false;
+    private float movementVertical = 0f;
     public bool facingRight = true;
     public bool isGrounded = false;
     public bool isWalled;
@@ -46,6 +41,18 @@ public class playerMovement : MonoBehaviour
     private float clampVel;
     public ParticleSystem skull;
     public ParticleSystem deathBlood;
+
+    //Grapple Data
+    [Header("Grapple")]
+    [SerializeField] float GRAPPLE_DISTANCE = 4.0f;
+    [SerializeField] float GRAPPLE_COOLDOWN;
+    [SerializeField] GameObject grapplePrefab;
+    [SerializeField] GameObject grappleIndicatorPrefab;
+    private GameObject grapple;
+    private LineRenderer grappleLine;
+    private Vector3 grappleDestination;
+    private bool isGrappling = false;
+    private float grappleTimer;
 
     // Start is called before the first frame update
     void Start()
@@ -72,12 +79,8 @@ public class playerMovement : MonoBehaviour
         transform.position = new Vector3(transform.position.x, transform.position.y, 0);
         if (!isGrappling)
         {
-            InitializeGrapple();
+            if (Input.GetMouseButtonDown(0) && grappleTimer == 0) InitializeGrapple();
             Movement();
-        }
-        else
-        {
-            ShootGrapple();
         }
 
         // Checkers
@@ -226,53 +229,83 @@ public class playerMovement : MonoBehaviour
     //Initialize the grapple
     void InitializeGrapple()
     {
-        if (Input.GetMouseButtonDown(0))
-        {
-            Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            grappleDestination = mousePos - this.transform.position;
-            grappleDestination = new Vector3(grappleDestination.x, grappleDestination.y, transform.position.z);
-            grappleDestination.Normalize();
-            grappleDestination = (grappleDestination * GRAPPLE_DISTANCE) + transform.position;
-            grapple.transform.position = transform.position;
-            grapple.SetActive(true);
-            isGrappling = true;
-            rb.velocity *= 0.2f;
-            grappleLine.enabled = true;
-            grappleLine.SetPosition(0, transform.position);
-            grappleLine.SetPosition(1, transform.position);
-        }
+        Vector3 mousePos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, transform.position.z - Camera.main.transform.position.z);
+        mousePos = Camera.main.ScreenToWorldPoint(mousePos);
+        grappleDestination = mousePos - transform.position;
+        grappleDestination = new Vector3(grappleDestination.x, grappleDestination.y, transform.position.z);
+        grappleDestination.Normalize();
+        grappleDestination = (grappleDestination * GRAPPLE_DISTANCE) + transform.position;
+        //Debug.Log(Mathf.Atan2(grappleDestination.y - transform.position.y, grappleDestination.x - transform.position.x) * Mathf.Rad2Deg);
+        grapple.transform.position = transform.position;
+        grapple.SetActive(true);
+        isGrappling = true;
+        rb.gravityScale = 0.2f;
+        rb.velocity *= 0.2f;
+        grappleLine.enabled = true;
+        grappleLine.SetPosition(0, transform.position);
+        grappleLine.SetPosition(1, transform.position);
+        StartCoroutine("ShootGrapple");
     }
 
     //Called while grappling
-    void ShootGrapple()
+    IEnumerator ShootGrapple()
     {
-        if (!grappleHit)
+        bool grappleHit = false;
+        while (Vector2.Distance(grappleDestination, grapple.transform.position) > 0.2f)
         {
             grapple.transform.position = Vector3.Lerp(grapple.transform.position, grappleDestination, 0.06f);
             grappleLine.SetPosition(1, grapple.transform.position);
             RaycastHit2D hit = Physics2D.Raycast(grapple.transform.position, grappleDestination, 0.05f);
             if (hit)
+            {
                 if (hit.rigidbody.gameObject.tag != "alive")
                 {
+                    StartCoroutine("ReturnGrapple");
                     grappleHit = true;
+                    break;
                 }
-            if (Vector2.Distance(grappleDestination, grapple.transform.position) < 0.2f)
-                EndGrapple();
-          
+            }
+            yield return null;
         }
-        else
+        if (!grappleHit) EndGrapple();
+    }
+
+    IEnumerator ReturnGrapple()
+    {
+        while (Vector2.Distance(grapple.transform.position, transform.position) > 0.2f)
         {
             transform.position = Vector3.Lerp(transform.position, grappleDestination, 0.06f);
             grappleLine.SetPosition(0, transform.position);
-            if (Vector2.Distance(grapple.transform.position, transform.position) < 0.2f)
-                EndGrapple();
+            yield return null;
         }
+        grappleTimer += 0.01f;
+        StartCoroutine("BeginGrappleTimer");
+        EndGrapple();
+    }
+
+    IEnumerator BeginGrappleTimer()
+    {
+        Color initColor = m_player.color;
+        Color currentColor = new Color(initColor.r / 100.0f, initColor.g / 100.0f, initColor.b / 100.0f);
+        float r, g, b;
+        while (grappleTimer < GRAPPLE_COOLDOWN)
+        {
+            grappleTimer += Time.deltaTime;
+            r = Mathf.Lerp(currentColor.r, initColor.r, Time.deltaTime);
+            g = Mathf.Lerp(currentColor.g, initColor.g, Time.deltaTime);
+            b = Mathf.Lerp(currentColor.b, initColor.b, Time.deltaTime);
+            currentColor = new Color(r,g,b);
+            m_player.SetColor("_EmissionColor", currentColor);
+            yield return null;
+        }
+        grappleTimer = 0;
+        m_player.SetColor("_EmissionColor", initColor);
+        Instantiate(grappleIndicatorPrefab, transform);
     }
 
     private void EndGrapple()
     {
         isGrappling = false;
-        grappleHit = false;
         grappleLine.enabled = false;
         grapple.SetActive(false);
     }

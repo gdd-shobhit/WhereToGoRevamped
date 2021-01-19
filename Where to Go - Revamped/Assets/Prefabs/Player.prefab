@@ -289,7 +289,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d2ab20d68373514b8db5d456cfdf3bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  grapplePrefab: {fileID: 3832634087401615162, guid: a0cfd9541a12c944d8cc24b5fd39b8fc, type: 3}
   m_Line: {fileID: 2100000, guid: 670cca87a17844341847b2dfd83304c8, type: 2}
   m_Fire: {fileID: 0}
   m_Frost: {fileID: 0}
@@ -314,3 +313,7 @@ MonoBehaviour:
   finalForce: {x: 0, y: 0, z: 0}
   skull: {fileID: 0}
   deathBlood: {fileID: 0}
+  GRAPPLE_DISTANCE: 4
+  GRAPPLE_COOLDOWN: 2
+  grapplePrefab: {fileID: 3832634087401615162, guid: a0cfd9541a12c944d8cc24b5fd39b8fc, type: 3}
+  grappleIndicatorPrefab: {fileID: 3832634087401615162, guid: 0f08c58954c20b54a9817d01802fca5c, type: 3}
