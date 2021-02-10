@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(Rigidbody))]
 public class HomeObjects : MonoBehaviour
 {
     
     public Transform targetTransform;
 
-    private Rigidbody2D rb;
+    private Rigidbody rb;
 
     public ParticleSystem ps;
     public float speed = 5f;
@@ -20,22 +20,22 @@ public class HomeObjects : MonoBehaviour
     void Start()
     {
         //targetTransform = GameObject.FindGameObjectWithTag("Player").transform;
-        rb = GetComponent<Rigidbody2D>();
+        rb = GetComponent<Rigidbody>();
+        targetTransform = GameObject.Find("Player").GetComponent<Transform>();
     }
     private void Update()
     {
         timer += Time.deltaTime;
         if (targetTransform != null)
         {
-
-            Vector2 direction = (Vector2)targetTransform.position - rb.position;
+            Vector3 direction = targetTransform.position - rb.position;
 
             direction.Normalize();
 
             float rotateAmount = Vector3.Cross(direction, transform.up).z;
 
-            rb.angularVelocity = -rotateAmount * rotateSpeed * GameManager.instance.timeMultiplier;
-
+            //rb.angularVelocity = new Vector3(0,0,-rotateAmount * rotateSpeed * GameManager.instance.timeMultiplier);
+            rb.rotation = Quaternion.FromToRotation(transform.position.normalized, direction);          
             rb.velocity = transform.up * speed * GameManager.instance.timeMultiplier;
 
         }
@@ -54,10 +54,12 @@ public class HomeObjects : MonoBehaviour
 
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerEnter(Collider collision)
     {
         if (collision.gameObject.tag == "alive")
         {
+            collision.gameObject.GetComponent<playerMovement>().life--;
+            if(collision.gameObject.GetComponent<playerMovement>().life <= 0)
             collision.gameObject.tag = "dead";
         }
         gameObject.tag = "dead";

@@ -5,7 +5,7 @@ using UnityEngine;
 public class enemySpawner : MonoBehaviour
 {
     public GameObject enemyPrefab;
-    public Transform placeToSpawnFrom;
+    private Vector3 placeToSpawnFrom;
     public Transform player;
     public bool spawner=false;
     public float timer;
@@ -14,6 +14,7 @@ public class enemySpawner : MonoBehaviour
     {
         timer = 0;
         enemyPrefab.GetComponent<HomeObjects>().targetTransform = player;
+        placeToSpawnFrom = new Vector3(player.position.x, player.position.y + 5, player.position.z);
     }
 
     void Update()
@@ -27,7 +28,7 @@ public class enemySpawner : MonoBehaviour
         }
         if (spawner == true)
         {
-            Instantiate(enemyPrefab, placeToSpawnFrom.position, Quaternion.Inverse(Quaternion.identity));
+            Instantiate(enemyPrefab, placeToSpawnFrom, Quaternion.Inverse(Quaternion.identity));
             spawner = false;
            
         }

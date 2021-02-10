@@ -17,11 +17,12 @@ public class playerMovement : MonoBehaviour
     public Material m_Fire;
     public Material m_Frost;
     public Material m_player;
-    private Vector3 futureDirection;
+    public Vector3 ogPosition;
+    public int life = 3;
 
     public Stances currentStance = Stances.Normal;
 
-    public Rigidbody rb;
+    private Rigidbody rb;
     public Vector3 centerOfMassActual;
     public float speed;
     public int jumps = 2;
@@ -57,6 +58,7 @@ public class playerMovement : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        ogPosition = transform.position;
         rb = GetComponent<Rigidbody>();
         grappleLine = gameObject.AddComponent<LineRenderer>();
         clampVel = 9f;
@@ -76,7 +78,7 @@ public class playerMovement : MonoBehaviour
     {
         rb.angularVelocity = Vector3.zero;
         // making the player always visible because it sometimes go off the z axis and isnt visible
-        transform.position = new Vector3(transform.position.x, transform.position.y, 0);
+        //transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z);
         if (!isGrappling)
         {
             if (Input.GetMouseButtonDown(0) && grappleTimer == 0) InitializeGrapple();
@@ -164,11 +166,7 @@ public class playerMovement : MonoBehaviour
 
         // Applying Force
         rb.AddForceAtPosition(finalForce, gameObject.transform.position,ForceMode.Force);
-        // rb.AddForce(finalForce, ForceMode.Force);
         rb.velocity = Vector3.ClampMagnitude(rb.velocity, clampVel);
-
-        // for kinetic object
-        // transform.position += new Vector3(movementHorizontal, 0, 0);
 
     }
 
@@ -214,7 +212,7 @@ public class playerMovement : MonoBehaviour
 
         if (gameObject.transform.position.y < -15f)
         {
-            gameObject.transform.position = new Vector3(0, 4, 0);
+            gameObject.transform.position = ogPosition;
             gameObject.transform.rotation = Quaternion.Euler(0, 0, 0);
         }
     }
@@ -222,7 +220,7 @@ public class playerMovement : MonoBehaviour
     void Respawn()
     {
             gameObject.SetActive(true);
-            gameObject.transform.position = new Vector3(0, 3, 0);
+            gameObject.transform.position = ogPosition;
             gameObject.tag = "alive";
     }
 
@@ -239,7 +237,7 @@ public class playerMovement : MonoBehaviour
         grapple.transform.position = transform.position;
         grapple.SetActive(true);
         isGrappling = true;
-        rb.gravityScale = 0.2f;
+        //rb.gravityScale = 0.2f;
         rb.velocity *= 0.2f;
         grappleLine.enabled = true;
         grappleLine.SetPosition(0, transform.position);
